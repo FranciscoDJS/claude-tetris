@@ -42,6 +42,14 @@ body {
   padding-top: 4px;
 }
 
+.title {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 6px;
+  color: #7aa2f7;
+  text-shadow: 0 0 16px rgba(122, 162, 247, 0.45);
+}
+
 .panel-section {
   display: flex;
   flex-direction: column;
