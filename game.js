@@ -4,7 +4,8 @@ const COLS = 10;
 const ROWS = 20;
 const BLOCK = 30;
 
-const COLORS = [
+// Paleta para fondo oscuro: tonos pastel
+const COLORS_DARK = [
   null,
   '#4dd0e1', // I - cyan
   '#ffd54f', // O - yellow
@@ -14,6 +15,21 @@ const COLORS = [
   '#90caf9', // J - azul pálido
   '#ffb74d', // L - orange
 ];
+
+// Paleta para fondo claro: mismos tonos (hue) con menor luminosidad y mayor
+// saturación, para mantener contraste sin cambiar la identidad de cada pieza
+const COLORS_LIGHT = [
+  null,
+  '#00a3b8', // I - cyan
+  '#f2a900', // O - yellow
+  '#9c3fb0', // T - purple
+  '#3e9a45', // S - green
+  '#d63a3a', // Z - red
+  '#2f6fd0', // J - azul
+  '#ee7a00', // L - orange
+];
+
+let COLORS = COLORS_DARK;
 
 const PIECES = [
   null,
@@ -39,6 +55,7 @@ const overlay = document.getElementById('overlay');
 const overlayTitle = document.getElementById('overlay-title');
 const overlayScore = document.getElementById('overlay-score');
 const restartBtn = document.getElementById('restart-btn');
+const themeBtn = document.getElementById('theme-toggle');
 
 let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId;
 
@@ -169,7 +186,7 @@ function drawBlock(context, x, y, colorIndex, size, alpha) {
 }
 
 function drawGrid() {
-  ctx.strokeStyle = '#22222e';
+  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--grid').trim();
   ctx.lineWidth = 0.5;
   for (let c = 1; c < COLS; c++) {
     ctx.beginPath();
@@ -301,4 +318,22 @@ document.addEventListener('keydown', e => {
 
 restartBtn.addEventListener('click', init);
 
+// El tema no es estado de partida: siempre empieza oscuro y no se resetea en init()
+function setTheme(theme) {
+  const light = theme === 'light';
+  document.documentElement.dataset.theme = light ? 'light' : 'dark';
+  COLORS = light ? COLORS_LIGHT : COLORS_DARK;
+  themeBtn.textContent = light ? 'Modo oscuro' : 'Modo claro';
+  themeBtn.setAttribute('aria-pressed', String(light));
+  // En pausa o game over el bucle está detenido: redibujar manualmente
+  draw();
+  drawNext();
+}
+
+themeBtn.addEventListener('click', () => {
+  setTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light');
+  themeBtn.blur(); // evita que Space active el botón durante la partida
+});
+
 init();
+setTheme('dark');
